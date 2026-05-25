@@ -1,26 +1,37 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   const { prompt } = req.body;
 
   if (!prompt) {
     return res.status(400).json({ error: "Missing prompt" });
   }
 
-  // 👉 先返回模拟图片（保证系统跑通）
-  const images = [
-    "https://picsum.photos/600/600?random=1",
-    "https://picsum.photos/600/600?random=2",
-    "https://picsum.photos/600/600?random=3"
-  ];
+  try {
+    const response = await fetch("https://api.siliconflow.cn/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `sk-qbdrwxbvzdztjrcmpbyrvvbfikfpyanihplvtnlbxymxzaal`
+      },
+      body: JSON.stringify({
+        model: "black-forest-labs/FLUX.1-schnell",
+        prompt: `amazon product photo, clean background, professional lighting, ${prompt}`,
+        size: "1024x1024"
+      })
+    });
 
-  const image = images[Math.floor(Math.random() * images.length)];
+    const data = await response.json();
 
-  return res.status(200).json({
-    image,
-    prompt,
-    status: "success"
-  });
+    const image = data?.data?.[0]?.url;
+
+    return res.status(200).json({
+      image,
+      prompt
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      error: "AI generation failed",
+      detail: err.message
+    });
+  }
 }
