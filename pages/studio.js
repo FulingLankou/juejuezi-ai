@@ -6,99 +6,74 @@ export default function Studio() {
   const [image, setImage] = useState(null);
 
   const generateImage = async () => {
+    if (!prompt) return alert("请输入商品描述");
+
     setLoading(true);
 
-    // 这里后面会接 AI（现在先做UI）
-    setTimeout(() => {
-      setImage("https://picsum.photos/600/600");
-      setLoading(false);
-    }, 2000);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await res.json();
+      setImage(data.image);
+    } catch (e) {
+      alert("生成失败，请检查API");
+    }
+
+    setLoading(false);
   };
 
   return (
     <div style={{
       minHeight: "100vh",
       background: "#f5f5f7",
-      padding: "60px 20px",
+      padding: 60,
       fontFamily: "Arial"
     }}>
       
-      <div style={{
-        maxWidth: 1000,
-        margin: "0 auto"
-      }}>
+      <h1 style={{ fontSize: 36 }}>
+        AI商品海报生成器
+      </h1>
 
-        <h1 style={{
-          fontSize: 40,
-          fontWeight: 700
-        }}>
-          AI商品海报生成器
-        </h1>
+      <p style={{ color: "#666" }}>
+        输入商品描述，生成电商级营销海报
+      </p>
 
-        <p style={{ color: "#666", marginTop: 10 }}>
-          输入商品描述，一键生成电商级营销海报
-        </p>
+      <textarea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="例如：夏季防晒喷雾，亚马逊风格，高级白底"
+        style={{
+          width: "100%",
+          height: 120,
+          marginTop: 20,
+          padding: 12,
+          borderRadius: 12
+        }}
+      />
 
-        {/* 输入区 */}
-        <div style={{
-          marginTop: 30,
-          background: "white",
-          padding: 20,
-          borderRadius: 16,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.05)"
-        }}>
-          
-          <textarea
-            placeholder="例如：夏季防晒喷雾，清爽蓝色风格，亚马逊电商主图"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            style={{
-              width: "100%",
-              height: 100,
-              border: "1px solid #eee",
-              borderRadius: 12,
-              padding: 12,
-              fontSize: 14
-            }}
-          />
+      <button
+        onClick={generateImage}
+        style={{
+          marginTop: 20,
+          padding: "12px 20px",
+          background: "#111",
+          color: "#fff",
+          borderRadius: 10,
+          cursor: "pointer"
+        }}
+      >
+        {loading ? "生成中..." : "生成电商海报"}
+      </button>
 
-          <button
-            onClick={generateImage}
-            style={{
-              marginTop: 15,
-              background: "#111",
-              color: "white",
-              padding: "12px 20px",
-              borderRadius: 10,
-              border: "none",
-              cursor: "pointer"
-            }}
-          >
-            {loading ? "生成中..." : "生成电商海报"}
-          </button>
+      {image && (
+        <div style={{ marginTop: 30 }}>
+          <img src={image} style={{ width: 400, borderRadius: 12 }} />
         </div>
-
-        {/* 输出区 */}
-        {image && (
-          <div style={{
-            marginTop: 30,
-            background: "white",
-            padding: 20,
-            borderRadius: 16,
-            textAlign: "center"
-          }}>
-            <img
-              src={image}
-              style={{
-                width: "100%",
-                maxWidth: 500,
-                borderRadius: 12
-              }}
-            />
-          </div>
-        )}
-
-      </div>
+      )}
     </div>
   );
-  }
+}
