@@ -6,25 +6,35 @@ export default function Studio() {
   const [image, setImage] = useState(null);
 
   const generateImage = async () => {
-    if (!prompt) return alert("请输入商品描述");
+  if (!prompt) return alert("请输入商品描述");
 
-    setLoading(true);
+  setLoading(true);
+  setImage(null);
 
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt })
-      });
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    });
 
-      const data = await res.json();
+    const data = await res.json();
+
+    if (data.image) {
       setImage(data.image);
-    } catch (e) {
-      alert("生成失败，请检查API");
+    } else {
+      alert("生成失败");
     }
 
-    setLoading(false);
-  };
+  } catch (err) {
+    console.error(err);
+    alert("接口错误");
+  }
+
+  setLoading(false);
+};
 
   return (
     <div style={{
