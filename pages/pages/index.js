@@ -41,17 +41,21 @@ export default function Home() {
             "AI换背景",
             "AI商品图增强"
           ].map((item, i) => (
-            <div key={i} style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 24,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.05)"
-            }}>
-              <h3>{item}</h3>
-              <p style={{color:"#888", marginTop:8}}>
-                点击进入生成工作台
-              </p>
-            </div>
+            <div
+  onClick={() => window.location.href = "/studio"}
+  style={{
+    background: "white",
+    borderRadius: 16,
+    padding: 24,
+    cursor: "pointer",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.05)"
+  }}
+>
+  <h3>AI商品海报</h3>
+  <p style={{color:"#888", marginTop:8}}>
+    点击进入生成工作台
+  </p>
+</div>
           ))}
           
         </div>
